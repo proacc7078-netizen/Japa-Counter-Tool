@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japa Count Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Colours */
+            --bg: #0E0A06;
+            --surface: #1A1208;
+            --border: #3D2A10;
+            --amber: #E8922A;
+            --amber-lt: #F5B85A;
+            --amber-dk: #A05C10;
+            --gold: #D4A843;
+            --cream: #F0E4C8;
+            --muted: #8A7055;
+            --error: #C0392B;
+            --success: #2ECC71;
+
+            /* Border radius */
+            --r: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--cream);
+            font-family: 'Crimson Pro', Georgia, serif;
+            line-height: 1.5;
+            padding: 28px 16px 48px;
+            max-width: 480px;
+            margin: 0 auto;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .om {
+            font-family: 'Cinzel', serif;
+            font-size: 2.4rem;
+            color: var(--amber);
+            margin-bottom: 8px;
+            display: inline-block;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                text-shadow: 0 0 20px rgba(232, 146, 42, 0.3);
+            }
+
+            50% {
+                text-shadow: 0 0 40px rgba(232, 146, 42, 0.7);
+            }
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--amber-lt);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--muted);
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            display: block;
+            position: relative;
+            border: 1.5px dashed var(--border);
+            border-radius: var(--r);
+            background: rgba(255, 255, 255, 0.015);
+            padding: 32px 16px;
+            text-align: center;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone.drag-over {
+            border: 1.5px solid var(--amber);
+            background: rgba(232, 146, 42, 0.05);
+        }
+
+        .upload-zone .icon {
+            font-size: 2.2rem;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .upload-zone .label-text {
+            font-family: 'Cinzel', serif;
+            font-size: 0.88rem;
+            color: var(--amber);
+            letter-spacing: 0.08em;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .upload-zone .hint {
+            font-size: 0.82rem;
+            font-weight: 300;
+            color: var(--muted);
+        }
+
+        #fileInput {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        #fileInput:focus {
+            outline: none;
+        }
+
+        /* File Info Badge */
+        #fileInfo {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(232, 146, 42, 0.08);
+            border: 1px solid var(--amber-dk);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 14px;
+        }
+
+        #fileInfo .fname-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+        }
+
+        #fileInfo .fname {
+            font-size: 0.88rem;
+            color: var(--amber-lt);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #clearFile {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        #clearFile:hover {
+            color: var(--error);
+        }
+
+        /* Calculate Button */
+        #calcBtn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px;
+            border: none;
+            border-radius: var(--r);
+            background: linear-gradient(135deg, var(--amber-dk) 0%, var(--amber) 60%, var(--amber-lt) 100%);
+            color: #1A0E00;
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(232, 146, 42, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: opacity 0.3s, transform 0.1s;
+        }
+
+        #calcBtn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.15) 100%);
+            pointer-events: none;
+        }
+
+        #calcBtn:active {
+            transform: scale(0.98);
+        }
+
+        #calcBtn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Error Message */
+        #errorMsg {
+            display: none;
+            background: rgba(192, 57, 43, 0.1);
+            border: 1px solid rgba(192, 57, 43, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            text-align: center;
+            color: #E88070;
+            font-size: 0.9rem;
+        }
+
+        /* Results Area */
+        #results {
+            display: none;
+            margin-top: 28px;
+            animation: fadeUp 0.4s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .total-card {
+            background: linear-gradient(135deg, #1E1408 0%, #261A08 100%);
+            border: 1px solid var(--amber-dk);
+            border-radius: var(--r);
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .total-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--amber), transparent);
+        }
+
+        .total-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            color: var(--muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        #totalCount {
+            font-family: 'Cinzel', serif;
+            font-size: 3.6rem;
+            font-weight: 700;
+            color: var(--amber-lt);
+            letter-spacing: 0.04em;
+            text-shadow: 0 0 32px rgba(232, 146, 42, 0.5);
+            line-height: 1;
+            margin-bottom: 8px;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+        }
+
+        @media screen and (max-width: 400px) {
+            #totalCount {
+                font-size: 2.8rem;
+            }
+        }
+
+        #totalSub {
+            font-size: 0.85rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--muted);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            display: block;
+            line-height: 1.2;
+        }
+
+        .stat-card.valid .stat-num {
+            color: var(--gold);
+        }
+
+        .stat-card.ignored .stat-num {
+            color: var(--muted);
+        }
+
+        .stat-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.76rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* Accordions */
+        .accordion {
+            margin-bottom: 14px;
+        }
+
+        .accordion-toggle {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--muted);
+            font-family: 'Crimson Pro', serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .accordion-toggle:hover {
+            border-color: var(--amber-dk);
+            color: var(--cream);
+        }
+
+        .accordion.open .accordion-toggle {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .arrow {
+            transition: transform 0.25s ease;
+        }
+
+        .accordion.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .accordion.open .accordion-content {
+            display: block;
+        }
+
+        .accordion-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .accordion-content::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        .accordion-content::-webkit-scrollbar-thumb {
+            background: var(--amber-dk);
+        }
+
+        .entry-list {
+            list-style: none;
+            padding: 10px 14px;
+        }
+
+        .entry-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(61, 42, 16, 0.3);
+            gap: 12px;
+        }
+
+        .entry-item:last-child {
+            border-bottom: none;
+        }
+
+        .entry-src {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        .entry-val {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: var(--amber-lt);
+            white-space: nowrap;
+        }
+
+        footer {
+            margin-top: 36px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #4A3820;
+        }
+
+        /* Date badge */
+        .date-badge {
+            font-family: 'Cinzel', serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .date-badge span {
+            color: var(--amber-lt);
+        }
+
+        /* Participants card */
+        .stat-card.participants .stat-num {
+            color: var(--amber-lt);
+        }
+
+        /* Review count card */
+        #reviewCount {
+            color: var(--error);
+        }
+
+        /* Sender badge in entries */
+        .entry-sender {
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            color: var(--amber-dk);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .entry-body {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        /* Reason tag in ignored */
+        .entry-reason {
+            font-size: 0.72rem;
+            color: #c0392b;
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        /* Accessibility */
+        :focus-visible {
+            outline: 2px solid var(--amber);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .om,
+            #results,
+            .arrow {
+                animation: none;
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="om">ॐ</div>
+        <h1>Japa Count Calculator</h1>
+        <div class="subtitle">Japa Yajna · Daily Total</div>
+    </header>
+
+    <hr>
+
+    <label class="upload-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".txt">
+        <span class="icon">📿</span>
+        <span class="label-text">Upload Chat Export</span>
+        <div class="hint">Tap to choose · WhatsApp .txt file</div>
+    </label>
+
+    <div id="fileInfo">
+        <div class="fname-container">
+            <span class="icon">📄</span>
+            <span class="fname" id="fileName">group-chat.txt</span>
+        </div>
+        <button id="clearFile" title="Clear file">✕</button>
+    </div>
+
+    <button id="calcBtn" disabled>Calculate Japa Total</button>
+
+    <div id="errorMsg"></div>
+
+    <div id="results">
+        <div class="date-badge">Count for: <span id="countDate">—</span></div>
+
+        <div class="total-card">
+            <div class="total-label">Total Japa Count</div>
+            <div id="totalCount">0</div>
+            <div id="totalSub">≈ 0 rounds of 108</div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card valid">
+                <span class="stat-num" id="validCount">0</span>
+                <span class="stat-label">Valid Entries</span>
+            </div>
+            <div class="stat-card ignored">
+                <span class="stat-num" id="ignoredCount">0</span>
+                <span class="stat-label">Ignored Lines</span>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card participants" style="grid-column:1/-1">
+                <span class="stat-num" id="participantsCount">0</span>
+                <span class="stat-label">Participants</span>
+            </div>
+        </div>
+
+        <div class="stats-row" id="reviewStatsRow" style="display:none">
+            <div class="stat-card" style="grid-column:1/-1">
+                <span class="stat-num" id="reviewCount">0</span>
+                <span class="stat-label">Needs Review</span>
+            </div>
+        </div>
+
+        <div class="stats-row" id="autoCorrectedStatsRow" style="display:none">
+            <div class="stat-card" style="grid-column:1/-1">
+                <span class="stat-num" id="autoCorrectedCount">0</span>
+                <span class="stat-label">Auto-corrected</span>
+            </div>
+        </div>
+
+        <div class="accordion" id="autoCorrectedAccordion" style="display:none">
+            <button class="accordion-toggle" onclick="toggleAccordion('autoCorrectedAccordion')">
+                Auto-corrected entries <span class="arrow">▾</span>
+            </button>
+            <div class="accordion-content">
+                <ul class="entry-list" id="autoCorrectedList"></ul>
+            </div>
+        </div>
+
+        <div class="accordion" id="entriesAccordion">
+            <button class="accordion-toggle" onclick="toggleAccordion('entriesAccordion')">
+                Parsed entries <span class="arrow">▾</span>
+            </button>
+            <div class="accordion-content">
+                <ul class="entry-list" id="entriesList"></ul>
+            </div>
+        </div>
+
+        <div class="accordion" id="ignoredAccordion">
+            <button class="accordion-toggle" onclick="toggleAccordion('ignoredAccordion')">
+                Ignored lines <span class="arrow">▾</span>
+            </button>
+            <div class="accordion-content">
+                <ul class="entry-list" id="ignoredList"></ul>
+            </div>
+        </div>
+
+        <div class="accordion" id="reviewAccordion" style="display:none">
+            <button class="accordion-toggle" onclick="toggleAccordion('reviewAccordion')">
+                Needs review <span class="arrow">▾</span>
+            </button>
+            <div class="accordion-content">
+                <ul class="entry-list" id="reviewList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Japa Yajna Group Admin Tool · v1.0
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const clearFile = document.getElementById('clearFile');
+        const calcBtn = document.getElementById('calcBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const results = document.getElementById('results');
+        const totalCount = document.getElementById('totalCount');
+        const totalSub = document.getElementById('totalSub');
+        const validCount = document.getElementById('validCount');
+        const ignoredCount = document.getElementById('ignoredCount');
+        const participantsCount = document.getElementById('participantsCount');
+        const countDate = document.getElementById('countDate');
+        const entriesList = document.getElementById('entriesList');
+        const ignoredList = document.getElementById('ignoredList');
+        const reviewList = document.getElementById('reviewList');
+        const autoCorrectedList = document.getElementById('autoCorrectedList');
+        const reviewStatsRow = document.getElementById('reviewStatsRow');
+        const reviewAccordion = document.getElementById('reviewAccordion');
+        const autoCorrectedStatsRow = document.getElementById('autoCorrectedStatsRow');
+        const autoCorrectedAccordion = document.getElementById('autoCorrectedAccordion');
+
+        let selectedFile = null;
+
+        // UI Helpers
+        function formatNum(n) {
+            return n.toLocaleString('en-IN');
+        }
+
+        function esc(s) {
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        function trim80(s) {
+            return s.length > 80 ? s.substring(0, 77) + '...' : s;
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+            results.style.display = 'none';
+        }
+
+        function hideError() {
+            errorMsg.style.display = 'none';
+        }
+
+        function toggleAccordion(id) {
+            const acc = document.getElementById(id);
+            acc.classList.toggle('open');
+        }
+
+        // File Selection
+        function setFile(file) {
+            if (!file) return;
+            if (!file.name.toLowerCase().endsWith('.txt')) {
+                showError('Please select a WhatsApp .txt export file.');
+                clearFileData();
+                return;
+            }
+            hideError();
+            selectedFile = file;
+            fileName.textContent = trim80(file.name);
+            fileInfo.style.display = 'flex';
+            calcBtn.disabled = false;
+            results.style.display = 'none';
+        }
+
+        function clearFileData() {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            calcBtn.disabled = true;
+            results.style.display = 'none';
+            hideError();
+        }
+
+        // Event Listeners
+        fileInput.addEventListener('change', (e) => setFile(e.target.files[0]));
+        clearFile.addEventListener('click', clearFileData);
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) {
+                setFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // ─── Core Parsing Logic ────────────────────────────────────────────
+
+        // Build today's date string in DD/MM/YYYY to match WhatsApp timestamps.
+        function getTodayStr() {
+            const now = new Date();
+            const d = String(now.getDate()).padStart(2, '0');
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const y = now.getFullYear();
+            return `${d}/${m}/${y}`; // e.g. "24/05/2026"
+        }
+
+        // Normalise a date token from the WhatsApp prefix to DD/MM/YYYY.
+        // Handles: DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY, M/D/YY (US)
+        function normDate(raw) {
+            // Split on any separator
+            const parts = raw.split(/[.\/\-]/);
+            if (parts.length !== 3) return null;
+            let [a, b, c] = parts.map(Number);
+            // Two-digit year → four-digit
+            if (c < 100) c += 2000;
+            // Detect US format M/D/YY where month is ≤12 and day might be >12
+            // We can't always tell; treat both as DD/MM/YYYY (Indian convention)
+            const dd = String(a).padStart(2, '0');
+            const mm = String(b).padStart(2, '0');
+            return `${dd}/${mm}/${c}`;
+        }
+
+        // Parse a raw WhatsApp line and return { date, sender, body } or null
+        // Formats:
+        //   [DD/MM/YYYY, HH:MM:SS] ~ Name: body
+        //   DD/MM/YYYY, HH:MM - Name: body
+        //   M/D/YY, HH:MM - Name: body
+        const WA_PREFIX = /^\[?(\d{1,4}[.\-\/]\d{1,2}[.\-\/]\d{2,4}),\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?)\]?\s*[-~]?\s*(.+)/i;
+
+        function parseLine(raw) {
+            const m = raw.trim().match(WA_PREFIX);
+            if (!m) return null;
+            const date = normDate(m[1]);
+            const rest = m[3];          // "Name: body" or "Name body"
+            const colonIdx = rest.indexOf(': ');
+            if (colonIdx === -1 || colonIdx > 60) return { date, sender: '', body: rest };
+            const sender = rest.slice(0, colonIdx).replace(/^~\s*/, '').trim();
+            const body = rest.slice(colonIdx + 2).trim();
+            return { date, sender, body };
+        }
+
+        // ─── System-message patterns ──────────────────────────────────────────
+        const SYSTEM_KEYWORDS = [
+            'joined', 'left', ' added ', 'removed', 'created this group',
+            'changed the group', 'deleted this message', 'missed voice call',
+            'missed video call', 'media omitted', 'end-to-end encrypted',
+            'security code', 'messages and calls', 'this message was deleted',
+            'using an invite link', 'using a group link', 'image omitted',
+            'video omitted', 'audio omitted', 'sticker omitted', 'document omitted',
+            'voice message omitted', 'contact card omitted'
+        ];
+
+        function isSystemMsg(body) {
+            if (!body || typeof body !== 'string') return false;
+            const lo = body.toLowerCase();
+            return SYSTEM_KEYWORDS.some(k => lo.includes(k));
+        }
+
+        // Verify math: if line has A × B = stated_result, check for typos
+        // Returns the value to use (could be stated or computed)
+        // and a correction object if auto-corrected
+        function verifyMath(text, statedResult, sender) {
+            if (!text || typeof text !== 'string') return null;
+            const multBeforeEq = text.match(/(\d[\d,]*)\s*[*×x]\s*(\d[\d,]*)\s*=/i);
+            if (!multBeforeEq || !multBeforeEq[1] || !multBeforeEq[2]) return null;
+
+            const a = parseInt(multBeforeEq[1].replace(/,/g, ''), 10);
+            const b = parseInt(multBeforeEq[2].replace(/,/g, ''), 10);
+            const computed = a * b;
+
+            if (statedResult === computed) return null; // Match, no correction needed
+
+            // Mismatch - check for typo patterns
+            let typoDetected = false;
+            let reason = '';
+
+            // Check A: Is stated result divisible by the first multiplier?
+            // e.g., 864 ÷ 108 = 8 (clean) - user mistyped multiplier
+            if (a !== 0 && statedResult % a === 0) {
+                const impliedB = statedResult / a;
+                if (impliedB > 0 && impliedB <= 1000) {
+                    typoDetected = true;
+                    reason = `Computed ${a}×${b}=${computed}, typed ${statedResult} differs`;
+                }
+            }
+
+            // Check B: Digit-drop (stated + 0 or computed - 0)
+            const statedStr = String(statedResult);
+            const computedStr = String(computed);
+            if (!typoDetected) {
+                // Check if dropping a zero from stated gives computed
+                if (statedStr.endsWith('0')) {
+                    const dropped = parseInt(statedStr.slice(0, -1), 10);
+                    if (dropped === computed) {
+                        typoDetected = true;
+                        reason = `Computed ${computed}, likely digit-drop from ${statedResult}`;
+                    }
+                }
+                // Check if adding a zero to stated gives computed
+                else if (computedStr === statedStr + '0') {
+                    typoDetected = true;
+                    reason = `Computed ${computed}, likely missing zero in ${statedResult}`;
+                }
+            }
+
+            // Check C: Within 10% tolerance
+            if (!typoDetected && computed > 0) {
+                const diff = Math.abs(computed - statedResult) / computed;
+                if (diff < 0.10) {
+                    typoDetected = true;
+                    reason = `Computed ${computed}, small difference from stated ${statedResult}`;
+                }
+            }
+
+            // Always use computed (math is ground truth) with appropriate reason
+            return {
+                used: computed,
+                correction: {
+                    sender: sender || 'unknown',
+                    src: text.slice(0, 120),
+                    stated: statedResult,
+                    computed: computed,
+                    reason: reason || `Computed ${computed}, stated ${statedResult} differs`
+                }
+            };
+        }
+
+        // ─── Extract a numeric japa count from a message body ─────────────────
+        // Returns an object with:
+        //   - name: extracted name (for proxy reporting) or null
+        //   - value: the extracted number or null
+        function extractCount(body, sender) {
+            if (!body || typeof body !== 'string') return { name: null, value: null };
+            const result = { name: null, value: null };
+
+            // Preprocessing: convert Indic numerals to ASCII, strip phone numbers, strip ALL commas, strip emoji/noise
+            let text = body
+                // Kannada digits ೦-೯ → 0-9
+                .replace(/೦/g,'0').replace(/೧/g,'1').replace(/೨/g,'2').replace(/೩/g,'3').replace(/೪/g,'4')
+                .replace(/೫/g,'5').replace(/೬/g,'6').replace(/೭/g,'7').replace(/೮/g,'8').replace(/೯/g,'9')
+                // Devanagari digits ०-९ → 0-9
+                .replace(/०/g,'0').replace(/१/g,'1').replace(/२/g,'2').replace(/३/g,'3').replace(/४/g,'4')
+                .replace(/५/g,'5').replace(/६/g,'6').replace(/७/g,'7').replace(/८/g,'8').replace(/९/g,'9')
+                // Strip phone number patterns: +91 XXXXX XXXXX, +91-XXXXX-XXXXX, etc.
+                .replace(/\+?\d{1,3}[\s-]?\d{4,}[\s-]?\d{4,}/g, ' ')
+                .replace(/,/g, '')                          // strip all commas
+                .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '') // strip emoji
+                .replace(/[.!?,;:]+\s*$/g, '');             // strip trailing punctuation
+
+            // Pattern 0 — Script-agnostic: Name (any script) - number or Name = number
+            // Formats: "ಜಗದೀಶ್ - 432", "राम = 1944", "Shankar ಶಂಕರ - 216", "Roopa_108 times"
+            const nameNumberPattern = /([^\d\=\-\*×x\n][^\d\=\-\*×x\n]*?)\s*[-=]\s*(\d[\d,]*)/i;
+            const nameMatch = text.match(nameNumberPattern);
+            if (nameMatch) {
+                const extractedName = nameMatch[1] ? nameMatch[1].trim() : '';
+                if (extractedName.length > 0 && nameMatch[2]) {
+                    const numPart = nameMatch[2].replace(/[^0-9]/g, '');
+                    if (numPart.length > 0) {
+                        result.name = extractedName;
+                        result.value = parseInt(numPart, 10);
+                        return result;
+                    }
+                }
+            }
+
+            // Pattern 0b — "Today's count 432", "My count 1944", "Japa count 300", "count3000" etc.
+            const keywordCountPattern = /(?:todays?|my|today|japa)['\s]*count[:\s]*(\d+)/i;
+            const kcMatch = text.match(keywordCountPattern);
+            if (kcMatch && kcMatch[1]) {
+                result.value = parseInt(kcMatch[1], 10);
+                return result;
+            }
+
+            // Pattern 0c — "Roopa_108 times" - name_underscore number times
+            const underscoreTimesPattern = /([A-Za-z][A-Za-z_]*?)_[_-]?(\d[\d,]*)\s*times/i;
+            const utMatch = text.match(underscoreTimesPattern);
+            if (utMatch && utMatch[2]) {
+                const numPart = utMatch[2].replace(/[^0-9]/g, '');
+                if (numPart.length > 0) {
+                    result.value = parseInt(numPart, 10);
+                    return result;
+                }
+            }
+
+            // Pattern 1 — Equals format (explicit = value after multiplication)
+            // Fix A: Numbers and operators are ASCII in WhatsApp messages regardless of script
+            // Formats: "108×80=864ono", "30*108=3240", "ಧರ್ನೇಶ್ 108×80=864"
+            const equalsPattern = /(\d[\d,]*)\s*[*×x]\s*(\d[\d,]*)\s*=\s*(\d[\d,]*)/i;
+            const eqMatch = text.match(equalsPattern);
+            if (eqMatch && eqMatch[3]) {
+                const stated = parseInt(eqMatch[3].replace(/[^0-9]/g, ''), 10);
+                result.stated = stated;
+                result.hasEquals = true;
+                result.value = stated; // Will be verified in parseJapaFile
+
+                // Extract name from before the multiplication (any script)
+                const beforeMult = text.substring(0, eqMatch.index).trim();
+                if (beforeMult) {
+                    result.name = beforeMult;
+                }
+                return result;
+            }
+
+            // Pattern 3 — Compute multiplication expressions
+            let workingText = text.replace(/(\d[\d,]*)\s*[*×x]\s*(\d[\d,]*)/gi, (_, a, b) => {
+                return String(parseInt(a.replace(/,/g, ''), 10) * parseInt(b.replace(/,/g, ''), 10));
+            });
+
+            // Pattern 4 — Script-agnostic: Pull ALL numbers regardless of surrounding text
+            // No word boundaries — matches "count3000", "500namam", "1080shetti" etc.
+            const nums = [];
+            const numRe = /(\d+)/g;
+            let nm;
+            while ((nm = numRe.exec(workingText)) !== null) {
+                const rawDigits = nm[1];
+                const len = rawDigits.length;
+                if (len === 10) continue;       // Phone number
+                if (len >= 7) continue;          // Date (26052026), timestamp, or other metadata
+                const n = parseInt(rawDigits, 10);
+                nums.push(n);
+            }
+
+            if (nums.length === 0) return result;
+
+            result.value = Math.max(...nums);
+            return result;
+        }
+
+        // ─── Main parser ──────────────────────────────────────────────────────
+        function parseJapaFile(text) {
+            const today = getTodayStr();
+            const lines = text.split(/\r?\n/);
+
+            // Step 1: Merge continuation lines into complete messages
+            const messages = []; // { date, sender, body, rawLine }
+            let currentMsg = null;
+
+            for (const rawLine of lines) {
+                const trimmed = rawLine.trim();
+                if (!trimmed) continue;
+
+                const parsed = parseLine(trimmed);
+                if (parsed) {
+                    // New timestamped line - save previous message and start new one
+                    if (currentMsg) messages.push(currentMsg);
+                    currentMsg = { date: parsed.date, sender: parsed.sender || '', body: parsed.body || '', rawLine: trimmed };
+                } else if (currentMsg) {
+                    // Continuation line - append to current message body with space separator
+                    currentMsg.body += ' ' + trimmed;
+                }
+                // Lines before any timestamp are ignored
+            }
+            if (currentMsg) messages.push(currentMsg);
+
+            // Per-sender accumulator
+            const senderMap = new Map();
+            const ignored = [];
+            const autoCorrected = [];
+            const needsReview = [];
+
+            for (const msg of messages) {
+                // Skip system messages
+                if (isSystemMsg(msg.body)) continue;
+
+                // Extract numeric count from the complete merged body
+                const extracted = extractCount(msg.body, msg.sender);
+
+                if (extracted.value === null || isNaN(extracted.value)) {
+                    ignored.push({ src: msg.rawLine.slice(0, 120), reason: 'no number found' });
+                    continue;
+                }
+
+                let val = extracted.value;
+
+                // Filter: numbers with 7+ digits are dates/phone/timestamps, never japa counts
+                if (val >= 1000000) {
+                    ignored.push({ src: msg.rawLine.slice(0, 120), reason: 'non-japa number (7+ digits)' });
+                    continue;
+                }
+
+                let entrySender = msg.sender || '(unknown)';
+
+                // Math verification for equals format
+                if (extracted.hasEquals && extracted.stated !== undefined) {
+                    const verification = verifyMath(msg.body, extracted.stated, msg.sender);
+                    if (verification && verification.correction) {
+                        autoCorrected.push(verification.correction);
+                        val = verification.used;
+                    }
+                }
+
+                // Proxy reporting detection
+                if (extracted.name && extracted.name !== '' && msg.sender) {
+                    const normalizedExtracted = extracted.name.toLowerCase().replace(/[^a-z\u0900-\u097F\u0C80-\u0CFF\u1CD0-\u1CFF]/g, '');
+                    const normalizedSender = msg.sender.toLowerCase().replace(/[^a-z\u0900-\u097F\u0C80-\u0CFF\u1CD0-\u1CFF]/g, '');
+                    if (normalizedExtracted !== normalizedSender) {
+                        entrySender = extracted.name;
+                    }
+                }
+
+                // Counts > 50,000 go to needs review
+                if (val > 50000) {
+                    needsReview.push({ src: msg.rawLine.slice(0, 120), value: val });
+                    continue;
+                }
+
+                // Per-participant tracking with correction handling
+                const key = entrySender;
+                if (!senderMap.has(key)) {
+                    senderMap.set(key, { entries: [], corrected: false });
+                }
+                const rec = senderMap.get(key);
+
+                const lbody = msg.body.toLowerCase();
+                const isCorrection = /correction|sorry|mistake|typo|wrong/i.test(lbody);
+
+                if (isCorrection) {
+                    rec.corrected = true;
+                    rec.entries = [{ sender: key, src: msg.rawLine.slice(0, 120), value: val }];
+                } else if (rec.corrected) {
+                    ignored.push({ src: msg.rawLine.slice(0, 120), reason: 'superseded by correction' });
+                } else {
+                    rec.entries.push({ sender: key, src: msg.rawLine.slice(0, 120), value: val });
+                }
+            }
+
+            // Flatten all valid entries
+            const entries = [];
+            for (const [, rec] of senderMap) {
+                entries.push(...rec.entries);
+            }
+
+            const total = entries.reduce((s, e) => s + e.value, 0);
+            const participants = senderMap.size;
+
+            return { date: today, total, participants, entries, ignored, needsReview, autoCorrected };
+        }
+
+        // ─── Rendering ────────────────────────────────────────────────────────
+        function renderResults(data) {
+            const [dd, mm, yyyy] = data.date.split('/');
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const niceDateStr = `${parseInt(dd)} ${monthNames[parseInt(mm) - 1]} ${yyyy}`;
+            countDate.textContent = niceDateStr;
+
+            totalCount.textContent = formatNum(data.total);
+            const rounds = Math.floor(data.total / 108);
+            totalSub.textContent = `≈ ${formatNum(rounds)} rounds of 108`;
+
+            validCount.textContent = formatNum(data.entries.length);
+            ignoredCount.textContent = formatNum(data.ignored.length);
+            participantsCount.textContent = formatNum(data.participants);
+
+            // Handle auto-corrected entries
+            const autoCorrectedStatsRow = document.getElementById('autoCorrectedStatsRow');
+            const autoCorrectedAccordion = document.getElementById('autoCorrectedAccordion');
+            if (data.autoCorrected && data.autoCorrected.length > 0) {
+                document.getElementById('autoCorrectedCount').textContent = formatNum(data.autoCorrected.length);
+                autoCorrectedStatsRow.style.display = 'grid';
+                autoCorrectedAccordion.style.display = 'block';
+                document.getElementById('autoCorrectedList').innerHTML = data.autoCorrected.map(item => `
+                    <li class="entry-item">
+                        <div class="entry-body">
+                            <div class="entry-sender">${esc(item.sender)}</div>
+                            <span class="entry-src">${esc(item.src)}</span>
+                            <span class="entry-reason">${esc(item.reason)}</span>
+                        </div>
+                        <span class="entry-val">${formatNum(item.computed)}</span>
+                    </li>
+                `).join('');
+            } else {
+                autoCorrectedStatsRow.style.display = 'none';
+                autoCorrectedAccordion.style.display = 'none';
+            }
+
+            entriesList.innerHTML = data.entries.map(e => `
+                <li class="entry-item">
+                    <div class="entry-body">
+                        <div class="entry-sender">${esc(e.sender)}</div>
+                        <span class="entry-src">${esc(e.src)}</span>
+                    </div>
+                    <span class="entry-val">${formatNum(e.value)}</span>
+                </li>
+            `).join('');
+
+            ignoredList.innerHTML = data.ignored.map(item => `
+                <li class="entry-item">
+                    <div class="entry-body">
+                        <span class="entry-src">${esc(item.src)}</span>
+                        <span class="entry-reason">${esc(item.reason)}</span>
+                    </div>
+                </li>
+            `).join('');
+
+            // Handle needsReview
+            if (data.needsReview && data.needsReview.length > 0) {
+                document.getElementById('reviewCount').textContent = formatNum(data.needsReview.length);
+                reviewStatsRow.style.display = 'grid';
+                reviewAccordion.style.display = 'block';
+                reviewList.innerHTML = data.needsReview.map(item => `
+                    <li class="entry-item">
+                        <div class="entry-body">
+                            <span class="entry-src">${esc(item.src)}</span>
+                            <span class="entry-reason">High count: ${formatNum(item.value)} (needs review)</span>
+                        </div>
+                    </li>
+                `).join('');
+            } else {
+                reviewStatsRow.style.display = 'none';
+                reviewAccordion.style.display = 'none';
+            }
+
+            results.style.display = 'block';
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Main Action
+        calcBtn.addEventListener('click', () => {
+            if (!selectedFile) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const text = e.target.result;
+                    const data = parseJapaFile(text);
+                    if (data.entries.length === 0 && data.ignored.length === 0 && (!data.needsReview || data.needsReview.length === 0) && (!data.autoCorrected || data.autoCorrected.length === 0)) {
+                        showError(`No messages found for today (${data.date}). Make sure you exported today's chat.`);
+                        return;
+                    }
+                    hideError();
+                    renderResults(data);
+                } catch (err) {
+                    showError('Parse error: ' + err.message);
+                    console.error(err);
+                }
+            };
+            reader.onerror = () => {
+                showError('Could not read the file. Please try again.');
+            };
+            reader.readAsText(selectedFile, 'UTF-8');
+        });
+    </script>
+</body>
+
+</html>
